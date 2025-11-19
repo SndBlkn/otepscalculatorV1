@@ -1,0 +1,5 @@
+{
+  "name": "OT SOC EPS Estimator",
+  "description": "A professional Operational Technology (OT) SOC sizing tool. It estimates Events Per Second (EPS) and storage requirements based on industrial asset inventory, utilizing Gemini AI for infrastructure analysis and recommendations.",
+  "requestFramePermissions": []
+}
