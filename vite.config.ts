@@ -4,7 +4,7 @@ import path from "path";
 
 export default defineConfig({
   plugins: [react()],
-  base: "/otepscalculatorV1/",   // 🔥 GitHub Pages için ZORUNLU
+  base: "/",   // Amplify için root path
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "."),
