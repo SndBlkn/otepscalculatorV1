@@ -12,7 +12,7 @@ const App: React.FC = () => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<any | null>(null);
   const [analysisError, setAnalysisError] = useState<string | null>(null);
-  const { user, logout } = useAuth();
+  const { user, isAdmin, logout } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -121,6 +121,17 @@ const App: React.FC = () => {
                   <p className="text-xs font-medium text-slate-300">{user.givenName} {user.familyName}</p>
                   <p className="text-[10px] text-slate-500">{user.company} &middot; {user.title}</p>
                 </div>
+                {isAdmin && (
+                  <button
+                    onClick={() => navigate('/admin')}
+                    className="text-xs text-purple-400 hover:text-purple-300 bg-purple-500/10 border border-purple-500/30 hover:border-purple-500/50 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    </svg>
+                    Admin
+                  </button>
+                )}
                 <button
                   onClick={handleLogout}
                   className="text-xs text-slate-400 hover:text-white bg-ot-900 border border-ot-700 hover:border-ot-600 px-3 py-1.5 rounded-lg transition-colors"

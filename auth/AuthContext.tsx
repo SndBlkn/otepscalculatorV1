@@ -6,6 +6,7 @@ import {
   signOut as cognitoSignOut,
   getCurrentSession,
   getUserAttributes,
+  getUserGroups,
   SignUpParams,
   UserAttributes,
 } from "./authService";
@@ -13,6 +14,7 @@ import {
 interface AuthContextType {
   user: UserAttributes | null;
   isAuthenticated: boolean;
+  isAdmin: boolean;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (params: SignUpParams) => Promise<void>;
@@ -27,6 +29,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [user, setUser] = useState<UserAttributes | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -38,8 +41,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       const session = await getCurrentSession();
       if (session && session.isValid()) {
         const attrs = await getUserAttributes();
+        const groups = await getUserGroups();
         setUser(attrs);
         setIsAuthenticated(true);
+        setIsAdmin(groups.includes("admin"));
       }
     } catch {
       // No valid session
@@ -51,8 +56,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const login = async (email: string, password: string) => {
     await cognitoSignIn(email, password);
     const attrs = await getUserAttributes();
+    const groups = await getUserGroups();
     setUser(attrs);
     setIsAuthenticated(true);
+    setIsAdmin(groups.includes("admin"));
   };
 
   const register = async (params: SignUpParams) => {
@@ -67,6 +74,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     cognitoSignOut();
     setUser(null);
     setIsAuthenticated(false);
+    setIsAdmin(false);
   };
 
   return (
@@ -74,6 +82,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       value={{
         user,
         isAuthenticated,
+        isAdmin,
         isLoading,
         login,
         register,

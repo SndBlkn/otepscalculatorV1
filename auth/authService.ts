@@ -126,6 +126,25 @@ export function getIdToken(): Promise<string | null> {
   });
 }
 
+export function getUserGroups(): Promise<string[]> {
+  const currentUser = userPool.getCurrentUser();
+  if (!currentUser) return Promise.resolve([]);
+
+  return new Promise((resolve) => {
+    currentUser.getSession(
+      (err: Error | null, session: CognitoUserSession | null) => {
+        if (err || !session) {
+          resolve([]);
+          return;
+        }
+        const payload = session.getIdToken().decodePayload();
+        const groups = payload["cognito:groups"] || [];
+        resolve(Array.isArray(groups) ? groups : []);
+      }
+    );
+  });
+}
+
 export function getUserAttributes(): Promise<UserAttributes | null> {
   const currentUser = userPool.getCurrentUser();
   if (!currentUser) return Promise.resolve(null);
