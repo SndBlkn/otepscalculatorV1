@@ -1,8 +1,10 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { OTDeviceCategory, CalculationResult, DeviceType, LogSourceType } from './types';
 import { DEFAULT_DEVICE_CATEGORIES, BYTES_PER_LOG, getRecommendedEps } from './constants';
 import ResultsDashboard from './components/ResultsDashboard';
-import { analyzeInfrastructure } from './services/geminiService';
+import { analyzeInfrastructure } from './services/bedrockService';
+import { useAuth } from './auth/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const App: React.FC = () => {
   const [devices, setDevices] = useState<OTDeviceCategory[]>(DEFAULT_DEVICE_CATEGORIES);
@@ -10,6 +12,13 @@ const App: React.FC = () => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<any | null>(null);
   const [analysisError, setAnalysisError] = useState<string | null>(null);
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login', { replace: true });
+  };
 
   // Calculate results whenever devices or multiplier changes
   const results: CalculationResult = useMemo(() => {
@@ -81,7 +90,7 @@ const App: React.FC = () => {
       const result = await analyzeInfrastructure(devices, results);
       setAnalysisResult(result);
     } catch (err) {
-      setAnalysisError("Failed to generate analysis. Please check your API Key configuration.");
+      setAnalysisError("Failed to generate analysis. Please check your AWS credentials configuration.");
     } finally {
       setIsAnalyzing(false);
     }
@@ -101,8 +110,24 @@ const App: React.FC = () => {
             </div>
             <h1 className="text-xl font-bold tracking-tight text-white">OT SOC <span className="text-ot-accent">EPS Estimator</span></h1>
           </div>
-          <div className="text-xs text-slate-400 hidden sm:block">
-             IEC 62443 / NIST Compatible Sizing
+          <div className="flex items-center gap-4">
+            <span className="text-xs text-slate-400 hidden sm:block">
+              IEC 62443 / NIST Compatible Sizing
+            </span>
+            {user && (
+              <div className="flex items-center gap-3 ml-4 pl-4 border-l border-ot-700">
+                <div className="text-right hidden sm:block">
+                  <p className="text-xs font-medium text-slate-300">{user.givenName} {user.familyName}</p>
+                  <p className="text-[10px] text-slate-500">{user.company} &middot; {user.title}</p>
+                </div>
+                <button
+                  onClick={handleLogout}
+                  className="text-xs text-slate-400 hover:text-white bg-ot-900 border border-ot-700 hover:border-ot-600 px-3 py-1.5 rounded-lg transition-colors"
+                >
+                  Logout
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </header>
@@ -226,7 +251,7 @@ const App: React.FC = () => {
               </div>
 
               <p className="text-sm text-slate-400 mb-6 leading-relaxed">
-                Generate a professional sizing report, risk assessment, and storage strategy based on your specific device inventory using Google Gemini.
+                Generate a professional sizing report, risk assessment, and storage strategy based on your specific device inventory using AWS Bedrock (Claude Sonnet).
               </p>
 
               {!analysisResult && (

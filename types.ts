@@ -36,7 +36,9 @@ export interface CalculationResult {
   }[];
 }
 
-export interface GeminiAnalysis {
-  analysis: string;
-  recommendations: string[];
+export interface AIAnalysis {
+  summary: string;
+  riskAssessment: string;
+  storageStrategy: string;
+  keyRecommendations: string[];
 }
