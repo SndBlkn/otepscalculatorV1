@@ -90,7 +90,8 @@ const App: React.FC = () => {
       const result = await analyzeInfrastructure(devices, results);
       setAnalysisResult(result);
     } catch (err) {
-      setAnalysisError("Failed to generate analysis. Please check your AWS credentials configuration.");
+      const message = err instanceof Error ? err.message : "Failed to generate analysis. Please try again.";
+      setAnalysisError(message);
     } finally {
       setIsAnalyzing(false);
     }
